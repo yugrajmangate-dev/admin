@@ -30,7 +30,14 @@ export type Restaurant = {
   address: string;
   operating_hours: OperatingHours[];
   dietary_tags: DietaryTag[];
+  tour?: RestaurantTour;
+  tables?: RestaurantTable[];
 };
+
+export type TourMarker = any;
+export type TourNode = any;
+export type RestaurantTour = any;
+export type RestaurantTable = any;
 
 // Data sourced from OpenStreetMap contributors (© OpenStreetMap, ODbL licence).
 // Coordinates, phone numbers, and websites are real and publicly verified.

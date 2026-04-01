@@ -55,29 +55,52 @@ function buildSeedRestaurant(restaurant: Restaurant): Restaurant {
   };
 }
 
-async function ensureDb() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
+/** In-memory fallback for read-only environments (e.g. Vercel serverless). */
+let _memDb: PlatformDatabase | null = null;
 
-  try {
-    await fs.access(DB_PATH);
-  } catch {
-    const seed: PlatformDatabase = {
+function getSeedDb(): PlatformDatabase {
+  if (!_memDb) {
+    _memDb = {
       restaurants: seedRestaurants.map(buildSeedRestaurant),
       bookings: [],
     };
-    await fs.writeFile(DB_PATH, JSON.stringify(seed, null, 2), "utf8");
+  }
+  return _memDb;
+}
+
+async function ensureDb() {
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    try {
+      await fs.access(DB_PATH);
+    } catch {
+      const seed = getSeedDb();
+      await fs.writeFile(DB_PATH, JSON.stringify(seed, null, 2), "utf8");
+    }
+  } catch {
+    // Read-only filesystem (e.g. Vercel) — silently fall back to in-memory db.
   }
 }
 
 async function readDb(): Promise<PlatformDatabase> {
   await ensureDb();
-  const raw = await fs.readFile(DB_PATH, "utf8");
-  return JSON.parse(raw) as PlatformDatabase;
+  try {
+    const raw = await fs.readFile(DB_PATH, "utf8");
+    return JSON.parse(raw) as PlatformDatabase;
+  } catch {
+    // File doesn't exist or is inaccessible — use in-memory seed data.
+    return getSeedDb();
+  }
 }
 
 async function writeDb(db: PlatformDatabase) {
-  await ensureDb();
-  await fs.writeFile(DB_PATH, JSON.stringify(db, null, 2), "utf8");
+  try {
+    await ensureDb();
+    await fs.writeFile(DB_PATH, JSON.stringify(db, null, 2), "utf8");
+  } catch {
+    // Read-only filesystem — keep changes in memory only.
+    _memDb = db;
+  }
 }
 
 function normalizeTextList(value: string | string[] | undefined) {

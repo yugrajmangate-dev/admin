@@ -1,0 +1,44 @@
+﻿.next/dev/types/validator.ts(90,31): error TS2344: Type 'typeof import("C:/Users/yugra/.gemini/antigravity/scratch/admin/app/api/admin/restaurants/[id]/tour/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/admin/restaurants/[id]/tour">'.
+  Types of property 'POST' are incompatible.
+    Type '(request: Request, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<Restaurant>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/types/validator.ts(90,31): error TS2344: Type 'typeof import("C:/Users/yugra/.gemini/antigravity/scratch/admin/app/api/admin/restaurants/[id]/tour/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/admin/restaurants/[id]/tour">'.
+  Types of property 'POST' are incompatible.
+    Type '(request: Request, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<Restaurant>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+components/admin/tour-editor.tsx(4,32): error TS2305: Module '"@/lib/restaurants"' has no exported member 'TourNode'.
+components/admin/tour-editor.tsx(4,47): error TS2305: Module '"@/lib/restaurants"' has no exported member 'TourMarker'.
+components/admin/tour-editor.tsx(30,55): error TS2339: Property 'tour' does not exist on type 'Restaurant'.
+components/admin/tour-editor.tsx(41,40): error TS7006: Parameter 'n' implicitly has an 'any' type.
+components/admin/tour-editor.tsx(46,9): error TS2353: Object literal may only specify known properties, and 'markers' does not exist in type 'PSVOptions'.
+components/admin/tour-editor.tsx(53,64): error TS2554: Expected 1 arguments, but got 2.
+components/admin/tour-editor.tsx(55,28): error TS7006: Parameter 'nodeId' implicitly has an 'any' type.
+components/admin/tour-editor.tsx(59,25): error TS7006: Parameter 'nodeId' implicitly has an 'any' type.
+components/admin/tour-editor.tsx(59,33): error TS7006: Parameter 'position' implicitly has an 'any' type.
+components/admin/tour-editor.tsx(73,17): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+components/admin/tour-editor.tsx(74,39): error TS7006: Parameter 'node' implicitly has an 'any' type.
+components/admin/tour-editor.tsx(164,37): error TS7006: Parameter 'node' implicitly has an 'any' type.
+components/restaurant-tour-viewer.tsx(4,15): error TS2724: '"@/lib/restaurants"' has no exported member named 'RestaurantTour'. Did you mean 'Restaurant'?
+components/virtual-tour/psv-manager.ts(6,15): error TS2305: Module '"@/lib/restaurants"' has no exported member 'TourNode'.
+components/virtual-tour/psv-manager.ts(34,34): error TS7006: Parameter 'm' implicitly has an 'any' type.
+components/virtual-tour/SceneViewer.tsx(6,15): error TS2724: '"@/lib/restaurants"' has no exported member named 'RestaurantTour'. Did you mean 'Restaurant'?
+components/virtual-tour/SceneViewer.tsx(29,33): error TS7006: Parameter 'n' implicitly has an 'any' type.
+components/virtual-tour/SceneViewer.tsx(45,24): error TS7006: Parameter 'node' implicitly has an 'any' type.
+components/virtual-tour/SceneViewer.tsx(48,29): error TS7006: Parameter 'm' implicitly has an 'any' type.
+components/virtual-tour/SceneViewer.tsx(129,32): error TS7006: Parameter 'n' implicitly has an 'any' type.
+lib/platform-db.ts(6,64): error TS2724: '"@/lib/restaurants"' has no exported member named 'RestaurantTable'. Did you mean 'Restaurant'?
+lib/platform-db.ts(42,5): error TS2353: Object literal may only specify known properties, and 'tables' does not exist in type 'Restaurant'.
+lib/platform-db.ts(106,39): error TS2339: Property 'tables' does not exist on type 'Restaurant'.
+lib/platform-db.ts(106,61): error TS7006: Parameter 'table' implicitly has an 'any' type.
+lib/platform-db.ts(108,27): error TS7006: Parameter 'table' implicitly has an 'any' type.
+lib/platform-db.ts(119,31): error TS7006: Parameter 'table' implicitly has an 'any' type.
+lib/platform-db.ts(199,5): error TS2353: Object literal may only specify known properties, and 'tables' does not exist in type 'Restaurant'.
+lib/platform-db.ts(233,29): error TS2339: Property 'tables' does not exist on type 'Restaurant'.
+lib/platform-db.ts(233,49): error TS7006: Parameter 'entry' implicitly has an 'any' type.
+lib/platform-db.ts(285,23): error TS2339: Property 'tour' does not exist on type 'Restaurant'.
