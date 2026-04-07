@@ -3,7 +3,7 @@ import { getPlatformRestaurantById } from "@/lib/platform-db";
 import { AdminTourEditor } from "@/components/admin/tour-editor";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export const metadata = {
@@ -12,7 +12,8 @@ export const metadata = {
 };
 
 export default async function TourEditorPage({ params }: PageProps) {
-  const restaurant = await getPlatformRestaurantById(params.id);
+  const resolvedParams = await params;
+  const restaurant = await getPlatformRestaurantById(resolvedParams.id);
 
   if (!restaurant) {
     notFound();
