@@ -149,6 +149,11 @@ export default function AdminLoginPage() {
                 Google
             </Button>
           </form>
+
+          <p className="mt-6 text-center text-sm text-slate-400">
+            New restaurant partner?{" "}
+            <a href="/admin/register" className="text-[#FF4F5A] font-semibold hover:underline">Register your business →</a>
+          </p>
         </div>
       </div>
     </div>

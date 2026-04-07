@@ -2,25 +2,28 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useAdminStore } from "@/lib/admin-store";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, MapPin, MoreVertical, Star, Compass } from "lucide-react";
+import { Plus, Search, MapPin, MoreVertical, Compass } from "lucide-react";
 import { RestaurantDrawer } from "@/components/admin/restaurant-drawer";
-// Use the type or assume fields based on what's in Firestore
 
 export default function RestaurantManager() {
   const [restaurants, setRestaurants] = useState<any[]>([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedRestaurant, setSelectedRestaurant] = useState<any | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { role, uid } = useAdminStore();
 
   useEffect(() => {
-    if (!db) {
-      setLoading(false);
-      return;
-    }
-    const q = query(collection(db, "restaurants"));
+    if (!db) { setLoading(false); return; }
+
+    const q = role === "super_admin"
+      ? query(collection(db, "restaurants"))
+      : query(collection(db, "restaurants"), where("ownerId", "==", uid));
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setRestaurants(data);
@@ -28,20 +31,27 @@ export default function RestaurantManager() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [role, uid]);
 
   const handleRowClick = (restaurant: any) => {
     setSelectedRestaurant(restaurant);
     setIsDrawerOpen(true);
   };
 
+  const filtered = restaurants.filter(r =>
+    r.name?.toLowerCase().includes(search.toLowerCase()) ||
+    r.neighborhood?.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="space-y-6 flex flex-col h-full animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">Restaurants</h2>
+          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
+            {role === "super_admin" ? "All Restaurants" : "My Restaurant"}
+          </h2>
           <p className="text-sm font-medium text-slate-500 mt-1">
-            Manage your listings and virtual tours.
+            {role === "super_admin" ? "Manage all listings on the platform." : "Manage your DineUp listing."}
           </p>
         </div>
         <Link href="/admin/restaurants/new">
@@ -57,10 +67,13 @@ export default function RestaurantManager() {
           <div className="relative w-full max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input 
-              placeholder="Search..." 
+              placeholder="Search by name or area..." 
+              value={search}
+              onChange={e => setSearch(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF4F5A]/20 focus:border-[#FF4F5A] transition-all"
             />
           </div>
+          <span className="text-xs text-slate-400 font-medium">{filtered.length} restaurants</span>
         </div>
         
         <div className="overflow-x-auto flex-1">
@@ -79,10 +92,10 @@ export default function RestaurantManager() {
               {loading ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
-                     Loading restaurants...
+                    <div className="flex justify-center"><div className="h-6 w-6 animate-spin rounded-full border-4 border-gray-200 border-t-[#FF4F5A]" /></div>
                   </td>
                 </tr>
-              ) : restaurants.length === 0 ? (
+              ) : filtered.length === 0 ? (
                  <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                      <div className="flex flex-col items-center justify-center space-y-3">
@@ -92,17 +105,19 @@ export default function RestaurantManager() {
                   </td>
                 </tr>
               ) : (
-                restaurants.map((restaurant) => (
+                filtered.map((restaurant) => (
                   <tr 
                     key={restaurant.id} 
                     onClick={() => handleRowClick(restaurant)}
-                    className="hover:bg-gray-50 transition-colors group cursor-pointer"
+                    className="hover:bg-[#FF4F5A]/5 transition-colors group cursor-pointer"
                   >
-                    <td className="px-6 py-4 font-semibold text-slate-900 flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-gray-100 overflow-hidden shrink-0 border border-gray-200">
-                         {restaurant.image && <img src={restaurant.image} alt="" className="w-full h-full object-cover" />}
+                    <td className="px-6 py-4 font-semibold text-slate-900">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-gray-100 overflow-hidden shrink-0 border border-gray-200">
+                           {restaurant.image && <img src={restaurant.image} alt="" className="w-full h-full object-cover" />}
+                        </div>
+                        {restaurant.name}
                       </div>
-                      {restaurant.name}
                     </td>
                     <td className="px-5 py-4 text-slate-500 font-medium">
                        <span className="flex items-center">
@@ -117,17 +132,16 @@ export default function RestaurantManager() {
                     </td>
                     <td className="px-5 py-4 text-slate-600">
                       {restaurant.tour ? (
-                        <span className="text-[#FF4F5A] text-xs font-semibold uppercase tracking-wider flex items-center">
-                            Published
-                        </span>
+                        <span className="text-[#FF4F5A] text-xs font-semibold uppercase tracking-wider">Published</span>
                       ) : (
                         <span className="text-gray-400 text-xs uppercase tracking-wider">No Tour</span>
                       )}
                     </td>
                     <td className="px-5 py-4">
-                      <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] uppercase font-bold tracking-widest">
-                        Active
-                      </span>
+                      {restaurant.suspended
+                        ? <span className="px-2.5 py-1 rounded-full bg-red-50 text-red-500 border border-red-100 text-[10px] uppercase font-bold tracking-widest">Suspended</span>
+                        : <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] uppercase font-bold tracking-widest">Active</span>
+                      }
                     </td>
                     <td className="px-5 py-4 text-right" onClick={(e) => e.stopPropagation()}>
                       <Button variant="ghost" size="icon" className="text-gray-400 hover:text-slate-900">

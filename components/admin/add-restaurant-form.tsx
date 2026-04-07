@@ -5,26 +5,23 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useAdminStore } from "@/lib/admin-store";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { MapPin, Plus, Store, Check, Target, Clock, Utensils, X, Info } from "lucide-react";
+import { MapPin, Store, Check, Info } from "lucide-react";
 
 export function AddRestaurantForm() {
   const router = useRouter();
+  const { uid } = useAdminStore();
   const [loading, setLoading] = useState(false);
   
-  // Basic Fields
   const [name, setName] = useState("");
   const [cuisine, setCuisine] = useState("");
   const [neighborhood, setNeighborhood] = useState("");
   const [description, setDescription] = useState("");
-  
-  // Location & Metrics
-  const [lat, setLat] = useState("40.7128");
-  const [lng, setLng] = useState("-74.0060");
+  const [lat, setLat] = useState("18.5204");
+  const [lng, setLng] = useState("73.8567");
   const [price, setPrice] = useState("$$$");
-  
-  // Display Assets
   const [image, setImage] = useState("https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c");
   const [website, setWebsite] = useState("");
 
@@ -49,6 +46,8 @@ export function AddRestaurantForm() {
       website,
       tags: [cuisine, neighborhood].filter(Boolean),
       rating: 4.5,
+      ownerId: uid || null,
+      suspended: false,
       createdAt: new Date().toISOString()
     };
 
@@ -79,7 +78,6 @@ export function AddRestaurantForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="p-8 space-y-8">
-        {/* Core Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-5">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 flex items-center">
@@ -89,7 +87,7 @@ export function AddRestaurantForm() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1.5 text-slate-700">Restaurant Name <span className="text-red-500">*</span></label>
-                <input required value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-[#FF4F5A] outline-none transition-all" placeholder="e.g. Catch NYC" />
+                <input required value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-[#FF4F5A] outline-none transition-all" placeholder="e.g. The Rustic Kitchen" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -123,7 +121,7 @@ export function AddRestaurantForm() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1.5 text-slate-700">Neighborhood <span className="text-red-500">*</span></label>
-                <input required value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-[#FF4F5A] outline-none transition-all" placeholder="e.g. Meatpacking District" />
+                <input required value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-[#FF4F5A] outline-none transition-all" placeholder="e.g. Koregaon Park" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -144,9 +142,6 @@ export function AddRestaurantForm() {
                    <div className="mt-3 aspect-video w-full rounded-lg overflow-hidden border border-gray-200 relative group">
                      {/* eslint-disable-next-line @next/next/no-img-element */}
                      <img src={image} alt="Preview" className="w-full h-full object-cover" />
-                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                       <span className="text-xs font-semibold text-white uppercase tracking-widest bg-black/60 px-3 py-1 rounded-full">Preview</span>
-                     </div>
                    </div>
                 )}
               </div>
