@@ -3,8 +3,7 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 import { AuthBootstrap } from "@/components/auth-bootstrap";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
+import { GlobalLayoutWrapper } from "@/components/global-layout-wrapper";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -36,9 +35,9 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AuthBootstrap />
-        <SiteHeader />
-        {children}
-        <SiteFooter />
+        <GlobalLayoutWrapper>
+          {children}
+        </GlobalLayoutWrapper>
       </body>
     </html>
   );

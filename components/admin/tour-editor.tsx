@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 interface AdminTourEditorProps {
   restaurant: Restaurant;
@@ -97,20 +99,19 @@ export function AdminTourEditor({ restaurant }: AdminTourEditorProps) {
 
   const handleSave = async () => {
     setSaving(true);
-    try {
-      const response = await fetch(`/api/admin/restaurants/${restaurant.id}/tour`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(tourData)
-      });
+    if (!db) {
+      toast.error("Firebase is not initialized");
+      setSaving(false);
+      return;
+    }
 
-      if (response.ok) {
-        toast.success("Tour saved successfully!");
-      } else {
-        toast.error("Failed to save tour.");
-      }
+    try {
+      const restaurantRef = doc(db, "restaurants", restaurant.id);
+      await updateDoc(restaurantRef, { tour: tourData });
+      toast.success("Tour saved successfully!");
     } catch (error) {
       toast.error("An error occurred while saving.");
+      console.error(error);
     } finally {
       setSaving(false);
     }
