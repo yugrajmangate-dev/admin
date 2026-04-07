@@ -1,0 +1,37 @@
+// FIRESTORE SECURITY RULES
+// Go to: https://console.firebase.google.com/project/studio-6775154063-2186f/firestore/rules
+// Paste these rules and click "Publish"
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── PUBLIC READ: Anyone can read restaurants (for the main website) ───
+    match /restaurants/{restaurantId} {
+      allow read: if true;
+
+      // Only authenticated users can write (create, update, delete)
+      allow create: if request.auth != null;
+      
+      // Update/Delete: only the owner OR super admin
+      allow update, delete: if request.auth != null && (
+        resource.data.ownerId == request.auth.uid ||
+        request.auth.token.email == "main@admin.com"
+      );
+    }
+
+    // ─── USERS: Can read own profile, admins can read all ───
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.token.email == "main@admin.com";
+    }
+
+    // ─── BOOKINGS ───
+    match /bookings/{bookingId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && 
+        resource.data.userId == request.auth.uid;
+    }
+  }
+}
