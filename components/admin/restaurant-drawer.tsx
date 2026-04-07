@@ -1,5 +1,11 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { doc, deleteDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { toast } from "sonner";
+
 import { motion, AnimatePresence } from "framer-motion";
 import { X, MapPin, Clock, Tag, Image as ImageIcon, Star } from "lucide-react";
 
@@ -10,6 +16,32 @@ interface RestaurantDrawerProps {
 }
 
 export function RestaurantDrawer({ isOpen, onClose, restaurant }: RestaurantDrawerProps) {
+  const router = useRouter();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!restaurant) return;
+    if (!db) {
+      toast.error("Firebase not initialized");
+      return;
+    }
+    
+    // Quick confirmation
+    if (!window.confirm(`Are you sure you want to delete ${restaurant.name}?`)) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteDoc(doc(db, "restaurants", restaurant.id));
+      toast.success("Restaurant deleted successfully");
+      onClose();
+    } catch (err) {
+      toast.error("Failed to delete restaurant");
+      console.error(err);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -112,9 +144,19 @@ export function RestaurantDrawer({ isOpen, onClose, restaurant }: RestaurantDraw
                 </div>
 
                 {/* Footer Action */}
-                <div className="p-6 border-t border-gray-200 bg-gray-50">
-                   <button className="w-full bg-slate-900 text-white font-semibold rounded-lg py-3 shadow-md hover:bg-slate-800 transition-colors">
-                     Edit Restaurant Details
+                <div className="p-6 border-t border-gray-200 bg-gray-50 flex gap-3">
+                   <button 
+                     onClick={() => router.push(`/admin/restaurants/${restaurant.id}/edit`)}
+                     className="flex-1 bg-slate-900 text-white font-semibold rounded-lg py-3 shadow-md hover:bg-slate-800 transition-colors"
+                   >
+                     Edit Details
+                   </button>
+                   <button 
+                     onClick={handleDelete}
+                     disabled={isDeleting}
+                     className="px-6 bg-red-50 text-red-600 font-semibold rounded-lg py-3 shadow-sm border border-red-200 hover:bg-red-100 transition-colors"
+                   >
+                     {isDeleting ? "Deleting..." : "Delete"}
                    </button>
                 </div>
               </>
