@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { SiteHeader } from "./site-header";
 import { SiteFooter } from "./site-footer";
+import { AuthModal } from "./auth-modal";
 
 export function GlobalLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -13,6 +14,7 @@ export function GlobalLayoutWrapper({ children }: { children: React.ReactNode })
       {!isAdmin && <SiteHeader />}
       {children}
       {!isAdmin && <SiteFooter />}
+      <AuthModal />
     </>
   );
 }
